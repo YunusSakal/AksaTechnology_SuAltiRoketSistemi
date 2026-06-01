@@ -1,6 +1,17 @@
 # SARA (Sualtı Roket Aracı) Yönetim Paneli
 
-Proje, portatif ve hızlı kurulum için SQLite veritabanı altyapısı ile çalışmaktadır. Ekstra bir SQL Server/SQLEXPRESS kurulumu gerektirmez.
+SARA Yönetim Paneli, Sualtı Roket Aracı'nın operasyonel süreçlerini, kullanıcı yetkilendirmelerini, telemetri veri akışını ve sistem konfigürasyonlarını merkezi bir web arayüzünden izlemek ve yönetmek amacıyla geliştirilmiş tam kapsamlı bir yönetim sistemidir. 
+
+Proje; hafif, taşınabilir ve hızlı kurulum avantajı sağlaması adına **ASP.NET Core MVC** mimarisi ve **SQLite** veritabanı altyapısı ile geliştirilmiştir. Ekstra bir SQL Server veya SQLEXPRESS kurulumu gerektirmeden doğrudan çalışır.
+
+---
+
+## 🚀 Genel Tanıtım ve Sistem Mimarisi
+
+Yönetim paneli, sualtı roket sistemlerinin test ve operasyon aşamalarında ihtiyaç duyulan tüm idari ve teknik fonksiyonları tek bir çatı altında toplar. Sistem temel olarak iki ana rolden oluşmaktadır:
+
+* **Yönetici (Admin) Paneli:** Sistem ayarları, kullanıcı yetkilendirmeleri, veri tabanı bakımı, ham veri izleme ve log mekanizmalarının yönetildiği en üst düzey kontrol merkezidir.
+* **Operatör (Kullanıcı) Paneli:** Sahadaki teknik personelin ve operatörlerin yarışma/test verilerini yüklediği, telemetri çıktılarını analiz ettiği operasyonel arayüzdür.
 
 
 ## 🛠️ Kurulum ve Çalıştırma
