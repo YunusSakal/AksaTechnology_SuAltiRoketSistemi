@@ -1,8 +1,14 @@
-# Sualtı Roket Sistemi - Güncel Son Sürüm
+# SARA (Sualtı Roket Aracı) Yönetim Paneli
 
-Bu sürüm SQLite ile çalışır. SQL Server/SQLEXPRESS kurulumu gerekmez.
+Proje, portatif ve hızlı kurulum için SQLite veritabanı altyapısı ile çalışmaktadır. Ekstra bir SQL Server/SQLEXPRESS kurulumu gerektirmez.
 
-## Çalıştırma
+## 🚀 Canlı Demo
+Sistemi bilgisayarınıza kurmadan doğrudan tarayıcı üzerinden test etmek için aşağıdaki bağlantıya tıklayabilirsiniz:
+👉 **[Canlı Demo Linki Buraya Eklenecek]**
+
+## 🛠️ Kurulum ve Çalıştırma
+
+Projeyi kendi bilgisayarınızda çalıştırmak için terminalde aşağıdaki komutları sırasıyla giriniz:
 
 ```bash
 cd SualtiRoketSistemi
@@ -10,41 +16,35 @@ dotnet restore
 dotnet run
 ```
 
-Tarayıcıda konsolda yazan adrese gidin. Genelde `https://localhost:xxxx` veya `http://localhost:xxxx` olur.
 
-## Varsayılan hesaplar
+ Tarayıcıda terminal ekranında yazan adrese gidin (Genelde https://localhost:xxxx veya http://localhost:xxxx formatındadır). İlk çalıştırmada veritabanı tabloları otomatik olarak oluşturulacaktır.
+## 👤 Varsayılan Hesaplar
 
-Admin hesabı:
-- E-posta: `admin@roket.gov.tr`
-- Şifre: `Admin@123`
+### Admin (Yönetici) Hesabı
+* **E-posta:** admin@roket.gov.tr
+* **Şifre:** `Admin@123`
 
-Normal kullanıcı hesabı:
-- E-posta: `user@roket.gov.tr`
-- Şifre: `Kullanici@123`
+### Operatör (Kullanıcı) Hesabı
+* **E-posta:** user@roket.gov.tr
+* **Şifre:** `Kullanici@123`
 
-## Bu sürümde yapılanlar
+## ✨ Öne Çıkan Özellikler
 
-### Kullanıcı ID dönüşümü
-- Kullanıcı kimliği alanı artık `KullaniciId` olarak kullanılır.
-- Veritabanı ilişki anahtarı `KayitId` olarak ayrıldı.
-- Kullanıcıya gösterilen ID sistem tarafından otomatik `USR-...` formatında üretilir.
-- Kayıt ve kullanıcı ekleme ekranlarında kişisel kimlik numarası istenmez.
-- Kullanıcı yönetimi ekranında `Kullanıcı ID` kolonu gösterilir.
+### 🔐 Kullanıcı Kimlik Yönetimi
+* Kullanıcı kimliği `KullaniciId` yapısı ile yönetilirken, veritabanı ilişki anahtarı `KayitId` olarak izole edilmiştir.
+* Kullanıcılara gösterilen ID, sistem tarafından otomatik olarak `USR-...` formatında üretilir.
+* Kişisel verilerin korunması amacıyla kayıt ekranlarında TC kimlik numarası istenmez.
+* Kullanıcı yönetimi ekranında şeffaf bir **Kullanıcı ID** kolonu yer alır.
 
-### Hareketli IMU rota paneli
-- Telemetri sayfasında Aşama-1 ve Aşama-2 için hareketli su altı roketi animasyonu eklendi.
-- `Oynat`, `Duraklat`, `Başa Al`, zaman kaydırıcı ve hız seçimi bulunur.
-- TXT dosyasındaki 2 Hz veriler zaman sırasına göre oynatılır.
-- Aşama-1 paneli; başlangıç/bitiş çizgisi, 10 m çizgisi, 50 m uzaklaşma çizgisi ve U dönüş rotasını gösterir.
-- Aşama-2 paneli; 30 m güvenli atış bölgesi ve yan görünüm/yüzeye çıkış animasyonunu gösterir.
-- Rota sapması, x ekseni/roll bozulması, kendi etrafında dönme/spin ve pitch yetersizliği görsel olarak işaretlenir.
 
-### TXT veri desteği
-- Eski format desteklenir: `timestamp,ax,ay,az,gx,gy,gz`
-- Yeni sekmeli yarışma veri formatları desteklenir: `time_s`, `accel_x_mps2`, `gyro_x_dps`, `roll_deg`, `pitch_deg`, `yaw_deg`, `depth_m`, `distance_from_shore_m`, `lateral_error_m`, `event` vb.
-- Verilen Aşama-1 ve Aşama-2 örnek dosyaları projeye eklendi:
-  - `wwwroot/imu_data/asama1_basarili_rota_imu_2hz.txt`
-  - `wwwroot/imu_data/asama2_basarili_rota_imu_2hz.txt`
+
+### 📊 TXT Veri Entegrasyonu
+* Virgülle ayrılmış standart telemetri formatı (`timestamp, ax, ay, az, gx, gy, gz`) tam olarak desteklenir.
+* Sekmeli yarışma veri formatları sistem tarafından otomatik tanınır: `time_s`, `accel_x_mps2`, `gyro_x_dps`, `roll_deg`, `pitch_deg`, `yaw_deg`, `depth_m`, `distance_from_shore_m`, `lateral_error_m`, `event`.
+* Sistemin test edilebilmesi için projeye hazır örnek veri dosyaları entegre edilmiştir:
+  * `wwwroot/imu_data/ klasöründen ulaşılabilir.
+
+
 
 ## Not
 
