@@ -2,9 +2,6 @@
 
 Proje, portatif ve hızlı kurulum için SQLite veritabanı altyapısı ile çalışmaktadır. Ekstra bir SQL Server/SQLEXPRESS kurulumu gerektirmez.
 
-## 🚀 Canlı Demo
-Sistemi bilgisayarınıza kurmadan doğrudan tarayıcı üzerinden test etmek için aşağıdaki bağlantıya tıklayabilirsiniz:
-👉 **[Canlı Demo Linki Buraya Eklenecek]**
 
 ## 🛠️ Kurulum ve Çalıştırma
 
