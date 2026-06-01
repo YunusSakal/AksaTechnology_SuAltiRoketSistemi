@@ -1,0 +1,163 @@
+@page
+@model SualtiRoketSistemi.Pages.Account.GirisModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Giriş / Kayıt";
+}
+
+<div class="login-page">
+    <div class="login-card" style="max-width:440px">
+        <div class="login-logo">
+            <div class="login-logo-circle">
+                <img src="~/img/logo.png" alt="Aksa Logo" class="aksa-logo-img" />
+            </div>
+            <div class="login-logo-title">Aksa Technology</div>
+            <div class="login-logo-sub">SUALTI ROKET SİSTEMİ · KONTROL PANELİ</div>
+        </div>
+
+        <!-- Sekme Başlıkları -->
+        <div style="display:flex; border-bottom:1px solid rgba(73,166,255,0.2); margin-bottom:24px; gap:0">
+            <button id="btnGiris" onclick="switchTab('giris')"
+                style="flex:1; padding:10px; background:none; border:none; border-bottom:2px solid #49a6ff;
+                       color:#49a6ff; font-size:14px; font-weight:600; cursor:pointer; transition:all .2s">
+                Giriş Yap
+            </button>
+            <button id="btnKayit" onclick="switchTab('kayit')"
+                style="flex:1; padding:10px; background:none; border:none; border-bottom:2px solid transparent;
+                       color:var(--text-muted); font-size:14px; font-weight:600; cursor:pointer; transition:all .2s">
+                Kayıt Ol
+            </button>
+        </div>
+
+        <!-- HATA / BAŞARI MESAJLARI -->
+        @if (!string.IsNullOrEmpty(Model.HataMesaji))
+        {
+            <div class="alert alert-danger">
+                <strong>⚠ Hata:</strong> @Model.HataMesaji
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(Model.BasariMesaji))
+        {
+            <div class="alert alert-success">
+                <strong>✓</strong> @Model.BasariMesaji
+            </div>
+        }
+
+        <!-- GİRİŞ FORMU -->
+        <div id="tabGiris">
+            <form method="post" asp-page-handler="Giris">
+                @Html.AntiForgeryToken()
+
+                <div class="form-group">
+                    <label class="form-label" for="email">E-Posta</label>
+                    <input class="form-control"
+                           type="email"
+                           id="email"
+                           name="Email"
+                           placeholder="kullanici@roket.gov.tr"
+                           value="@Model.Email"
+                           autocomplete="username"
+                           required />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="sifre">Şifre</label>
+                    <input class="form-control"
+                           type="password"
+                           id="sifre"
+                           name="Sifre"
+                           placeholder="••••••••"
+                           autocomplete="current-password"
+                           required />
+                </div>
+
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px">
+                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-muted); cursor:pointer">
+                        <input type="checkbox" name="BeniHatirla" style="accent-color:var(--accent)" />
+                        Beni hatırla
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-full" style="justify-content:center; font-size:15px; padding:12px">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/>
+                    </svg>
+                    Sisteme Giriş
+                </button>
+            </form>
+
+            <div style="text-align:center; margin-top:16px; font-size:12px; color:var(--text-muted)">
+                Admin hesabı: admin@roket.gov.tr / Admin@123
+                <br>
+                Kullanıcı hesabı: user@roket.gov.tr / Kullanici@123
+            </div>
+        </div>
+
+        <!-- KAYIT FORMU -->
+        <div id="tabKayit" style="display:none">
+            <form method="post" asp-page-handler="Kayit">
+                @Html.AntiForgeryToken()
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+                    <div class="form-group">
+                        <label class="form-label">Ad</label>
+                        <input class="form-control" type="text" name="KullaniciAdi"
+                               placeholder="Ahmet" value="@Model.KayitAdi" required />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Soyad</label>
+                        <input class="form-control" type="text" name="KullaniciSoyadi"
+                               placeholder="Yılmaz" value="@Model.KayitSoyadi" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">E-Posta</label>
+                    <input class="form-control" type="email" name="KayitEmail"
+                           placeholder="kullanici@roket.gov.tr"
+                           value="@Model.KayitEmail" required />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Şifre</label>
+                    <input class="form-control" type="password" name="KayitSifre"
+                           placeholder="••••••••" minlength="6" required />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Şifre Tekrar</label>
+                    <input class="form-control" type="password" name="KayitSifreTekrar"
+                           placeholder="••••••••" minlength="6" required />
+                </div>
+
+                <button type="submit" class="btn btn-primary w-full" style="justify-content:center; font-size:15px; padding:12px; margin-top:4px">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8zM19 8v6M22 11h-6"/>
+                    </svg>
+                    Kayıt Ol
+                </button>
+
+                <div style="text-align:center; margin-top:14px; font-size:12px; color:var(--text-muted)">
+                    Kayıt sonrası <strong style="color:var(--accent)">Kullanıcı</strong> rolü atanır.
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function switchTab(tab) {
+    var isGiris = tab === 'giris';
+    document.getElementById('tabGiris').style.display = isGiris ? 'block' : 'none';
+    document.getElementById('tabKayit').style.display = isGiris ? 'none' : 'block';
+    document.getElementById('btnGiris').style.borderBottomColor = isGiris ? '#49a6ff' : 'transparent';
+    document.getElementById('btnGiris').style.color = isGiris ? '#49a6ff' : 'var(--text-muted)';
+    document.getElementById('btnKayit').style.borderBottomColor = isGiris ? 'transparent' : '#49a6ff';
+    document.getElementById('btnKayit').style.color = isGiris ? 'var(--text-muted)' : '#49a6ff';
+}
+// Kayıt hatasında kayıt sekmesini aç
+@if (Model.AktifSekme == "kayit")
+{
+    <text>document.addEventListener('DOMContentLoaded', function() { switchTab('kayit'); });</text>
+}
+</script>

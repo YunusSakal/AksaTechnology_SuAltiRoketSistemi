@@ -1,0 +1,192 @@
+@page
+@model SualtiRoketSistemi.Pages.Telemetri.GecmisVeriModel
+@{
+    ViewData["Title"] = "Geçmiş Veriler";
+    ViewData["ActivePage"] = "gecmis";
+}
+
+<div class="page-header">
+    <div>
+        <div class="page-title">Geçmiş IMU Verileri</div>
+        <div class="page-subtitle">Karşılaştırmalı dosya analizi · Trend görüntüleme</div>
+    </div>
+</div>
+
+<!-- Dosya Karşılaştırma -->
+<div class="panel mb-16">
+    <div class="panel-header">
+        <span class="panel-title">DOSYA SEÇİM & KARŞILAŞTIRMA</span>
+    </div>
+    <form method="get" style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end">
+        <div class="form-group" style="margin:0">
+            <label class="form-label">1. Dosya</label>
+            <select name="d1" class="form-control" style="min-width:220px">
+                <option value="">-- Seçin --</option>
+                @foreach (var d in Model.DosyaListesi)
+                {
+                    <option value="@d" selected="@(d == Model.Dosya1)">@d</option>
+                }
+            </select>
+        </div>
+        <div class="form-group" style="margin:0">
+            <label class="form-label">2. Dosya (karşılaştırma)</label>
+            <select name="d2" class="form-control" style="min-width:220px">
+                <option value="">-- Seçin (opsiyonel) --</option>
+                @foreach (var d in Model.DosyaListesi)
+                {
+                    <option value="@d" selected="@(d == Model.Dosya2)">@d</option>
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Göster</button>
+    </form>
+</div>
+
+@if (Model.Veri1.Any())
+{
+    <!-- İstatistik kartları -->
+    <div class="stats-grid mb-16">
+        @{
+            float ax1avg = Model.Veri1.Average(v => v.Ax);
+            float ay1avg = Model.Veri1.Average(v => v.Ay);
+            float az1avg = Model.Veri1.Average(v => v.Az);
+        }
+        <div class="stat-card">
+            <div class="stat-label">ax Ortalama</div>
+            <div class="stat-value">@ax1avg.ToString("F3")</div>
+            <div class="stat-unit">m/s²</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">ay Ortalama</div>
+            <div class="stat-value">@ay1avg.ToString("F3")</div>
+            <div class="stat-unit">m/s²</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">az Ortalama</div>
+            <div class="stat-value">@az1avg.ToString("F3")</div>
+            <div class="stat-unit">m/s²</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Toplam Örnek</div>
+            <div class="stat-value">@Model.Veri1.Count</div>
+            <div class="stat-unit">satır</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">ax Max</div>
+            <div class="stat-value text-warning">@Model.Veri1.Max(v=>v.Ax).ToString("F3")</div>
+            <div class="stat-unit">m/s²</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">az Max</div>
+            <div class="stat-value text-danger">@Model.Veri1.Max(v=>v.Az).ToString("F3")</div>
+            <div class="stat-unit">m/s²</div>
+        </div>
+    </div>
+
+    <!-- Karşılaştırma grafikleri -->
+    <details class="accordion" open>
+        <summary>İVMEÖLÇER — Dosya Karşılaştırma</summary>
+        <div class="accordion-body">
+            <div class="panel-row">
+                <div class="panel"><div class="chart-wrap"><canvas id="cmpAxChart"></canvas></div></div>
+                <div class="panel"><div class="chart-wrap"><canvas id="cmpAyChart"></canvas></div></div>
+            </div>
+        </div>
+    </details>
+
+    <details class="accordion mt-16">
+        <summary>JİROSKOP — Dosya Karşılaştırma</summary>
+        <div class="accordion-body">
+            <div class="panel-row">
+                <div class="panel"><div class="chart-wrap"><canvas id="cmpGxChart"></canvas></div></div>
+                <div class="panel"><div class="chart-wrap"><canvas id="cmpGyChart"></canvas></div></div>
+            </div>
+        </div>
+    </details>
+
+    <!-- Dosya Listesi -->
+    <div class="panel mt-16">
+        <div class="panel-header"><span class="panel-title">MEVCUT IMU DOSYALARI</span></div>
+        <table class="data-table">
+            <thead><tr><th>Dosya Adı</th><th>Görüntüle</th></tr></thead>
+            <tbody>
+                @foreach (var d in Model.DosyaListesi)
+                {
+                    <tr>
+                        <td class="mono">@d</td>
+                        <td>
+                            <a asp-page="/Telemetri/Index" asp-route-dosya="@d" class="btn btn-secondary btn-sm">
+                                📊 Anlık Görüntüle
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@section Scripts {
+<script>
+const v1 = @Html.Raw(Model.Veri1Json);
+const v2 = @Html.Raw(Model.Veri2Json);
+
+function safeNum(v, fallback = null) {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : fallback;
+}
+function chartLabels(a, b) {
+    const len = Math.max(a?.length || 0, b?.length || 0);
+    const source = (a?.length || 0) >= (b?.length || 0) ? a : b;
+    return Array.from({ length: len }, (_, i) => {
+        const t = safeNum(source?.[i]?.timeS, null);
+        return t === null ? String(i + 1) : t.toFixed(1);
+    });
+}
+function dataFor(rows, key, len) {
+    return Array.from({ length: len }, (_, i) => safeNum(rows?.[i]?.[key], null));
+}
+function mkChart(id, label1, rows1, label2, rows2, key, yLabel) {
+    const ctx = document.getElementById(id)?.getContext('2d');
+    if (!ctx || !rows1 || !rows1.length) return null;
+
+    const lbls = chartLabels(rows1, rows2);
+    const ds = [
+        { label: label1, data: dataFor(rows1, key, lbls.length), borderColor: '#49a6ff', borderWidth: 1.5, pointRadius: 0, tension: 0.3, spanGaps: true }
+    ];
+    if (rows2 && rows2.length > 0) {
+        ds.push({ label: label2, data: dataFor(rows2, key, lbls.length), borderColor: '#ff5c79', borderWidth: 1.5, pointRadius: 0, tension: 0.3, spanGaps: true });
+    }
+
+    return new Chart(ctx, {
+        type: 'line',
+        data: { labels: lbls, datasets: ds },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            animation: { duration: 300 },
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { labels: { color: '#9aa0b7', font: { size: 11 } } } },
+            scales: {
+                x: { ticks: { color: '#9aa0b7', maxTicksLimit: 8 }, grid: { color: '#1a2347' } },
+                y: { title: { display: true, text: yLabel, color: '#9aa0b7', font: { size: 11 } }, ticks: { color: '#9aa0b7' }, grid: { color: '#1a2347' } }
+            }
+        }
+    });
+}
+
+if (v1 && v1.length) {
+    const charts = [
+        mkChart('cmpAxChart', '@Model.Dosya1 · ax', v1, '@Model.Dosya2 · ax', v2, 'ax', 'ax (m/s²)'),
+        mkChart('cmpAyChart', '@Model.Dosya1 · ay', v1, '@Model.Dosya2 · ay', v2, 'ay', 'ay (m/s²)'),
+        mkChart('cmpGxChart', '@Model.Dosya1 · gx', v1, '@Model.Dosya2 · gx', v2, 'gx', 'gx (°/s)'),
+        mkChart('cmpGyChart', '@Model.Dosya1 · gy', v1, '@Model.Dosya2 · gy', v2, 'gy', 'gy (°/s)')
+    ].filter(Boolean);
+
+    document.querySelectorAll('details.accordion').forEach(el => {
+        el.addEventListener('toggle', () => {
+            if (el.open) setTimeout(() => charts.forEach(c => c.resize()), 60);
+        });
+    });
+}
+</script>
+}

@@ -1,0 +1,219 @@
+@page
+@model SualtiRoketSistemi.Pages.Gorevler.IndexModel
+@{
+    ViewData["Title"] = "Görevler";
+    ViewData["ActivePage"] = "gorevler";
+    var tabloKolon = User.IsInRole("Admin") ? 8 : 7;
+}
+
+<div class="page-header">
+    <div>
+        <div class="page-title">@(User.IsInRole("Admin") ? "Görev Yönetimi" : "Görevlerim")</div>
+        <div class="page-subtitle">@(User.IsInRole("Admin") ? "Tüm dalış ve test görevleri" : "Size atanmış dalış ve test görevleri")</div>
+    </div>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-page="/Gorevler/GorevEkle" class="btn btn-primary" style="text-decoration:none;">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:4px;">
+                <path d="M12 5v14M5 12h14"/>
+            </svg>
+            Görev Ekle
+        </a>
+    }
+</div>
+
+@if (TempData["Mesaj"] != null)
+{
+    <div class="alert alert-success">@TempData["Mesaj"]</div>
+}
+
+@if (TempData["Hata"] != null)
+{
+    <div class="alert alert-danger">@TempData["Hata"]</div>
+}
+
+
+<!-- TEKNOFEST 2026 Görev Tanımları ve Değerlendirme Kriterleri -->
+<div class="panel panel-full mb-16 gorev-tanim-panel" style="margin-bottom:18px;">
+    <div class="panel-header" style="align-items:flex-start; gap:12px; flex-wrap:wrap;">
+        <div>
+            <span class="panel-title">GÖREV TANIMLARI VE DEĞERLENDİRME KRİTERLERİ</span>
+            <div class="text-muted" style="font-size:13px; margin-top:6px; line-height:1.55; max-width:980px;">
+                TEKNOFEST 2026 Su Altı Roket Yarışması iki görev aşamasından oluşur. Takımlara montaj ve hazırlık için 15 dakika verilir.
+                Her sistemde basmalı/çevirmeli acil durdurma butonu bulunması zorunludur. Hakem heyeti güvenlik gerekçesiyle yarışmayı sonlandırabilir.
+            </div>
+        </div>
+        <span class="badge badge-info">TEKNOFEST 2026</span>
+    </div>
+
+    <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); margin-bottom:18px;">
+        <div class="stat-card">
+            <div class="stat-label">Aşama 1</div>
+            <div class="stat-value">300</div>
+            <div class="stat-unit">maksimum puan · 3 dakika</div>
+        </div>
+        <div class="stat-card success">
+            <div class="stat-label">Aşama 2</div>
+            <div class="stat-value">400+</div>
+            <div class="stat-unit">maksimum puan + 80'e kadar bonus · 1 dakika</div>
+        </div>
+        <div class="stat-card warning">
+            <div class="stat-label">Geçiş Şartı</div>
+            <div class="stat-value">150</div>
+            <div class="stat-unit">Aşama 1 minimum puan</div>
+        </div>
+    </div>
+
+    <div class="panel-row" style="align-items:stretch;">
+        <div class="panel" style="min-width:320px;">
+            <div class="panel-header">
+                <span class="panel-title">AŞAMA-1 · SEYİR VE BAŞLANGIÇ NOKTASINA GERİ DÖNÜŞ</span>
+                <span class="badge badge-info">3 dk</span>
+            </div>
+            <div class="text-muted" style="font-size:13px; line-height:1.6;">
+                <p>
+                    SARA, başlangıç alanından itibaren 2 metre derinlikte kıyıya dik olarak 10 metre düz ilerledikten sonra süre başlar.
+                    Araç kıyıdan en az 50 metre uzaklaştıktan sonra kıyıdan 10 metre uzaklıktaki başlangıç/bitiş çizgisine otonom olarak geri dönmelidir.
+                </p>
+                <p>
+                    Görev boyunca belirlenen güvenli bölge içinde kalınması, rota değişimlerinin tanımlanan limitler içinde yapılması ve aracın başlangıç/bitiş çizgisine güvenli biçimde dönmesi beklenir.
+                    Araç ağırlık merkezine ip, misina vb. yardımıyla bağlanan şamandıra ile dışarıdan takip edilebilir olmalıdır. Görev drone ile kayıt altına alınır.
+                </p>
+            </div>
+            <div style="overflow-x:auto; margin-top:12px;">
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Aşama - 1 Kriteri</th><th>Puanlama</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Süre Puanı</td><td class="mono text-accent">150 Puan</td></tr>
+                        <tr><td>Başlangıç/Bitiş Çizgisinde Enerjiyi Keserek Güvenli Sonlandırma</td><td class="mono text-accent">90 Puan</td></tr>
+                        <tr><td>Görev Boyunca Sızdırmazlığın Sağlanması</td><td class="mono text-accent">60 Puan</td></tr>
+                        <tr><td>Kazanılabilecek Maksimum Puan</td><td class="mono text-success">300 Puan</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="alert alert-info" style="margin-top:12px; line-height:1.55;">
+                Süre Puanı (SP) = 150 × (Parkurun tamamlanan en kısa süresi / Takımın parkuru tamamlama süresi). Aşama 1'de en az 150 puan alamayan takımlar üst aşamaya geçemez.
+            </div>
+        </div>
+
+        <div class="panel" style="min-width:320px;">
+            <div class="panel-header">
+                <span class="panel-title">AŞAMA-2 · ROKET ATEŞLEME</span>
+                <span class="badge badge-warning">1 dk</span>
+            </div>
+            <div class="text-muted" style="font-size:13px; line-height:1.6;">
+                <p>
+                    SARA, ön kısımdaki roket taşıma bölmesini kullanarak kıyıya dik ve düz istikamette 30 metre ilerler.
+                    Güvenli atış bölgesine otonom ulaştıktan sonra uygun yunuslama açısıyla satha çıkmalı ve roket ateşleme mekanizmasını otonom şekilde çalıştırmalıdır.
+                </p>
+                <p>
+                    Roket ateşleme işlemi yalnızca belirlenen hedef/güvenli atış bölgesi içerisinde gerçekleştirilmelidir. Yanlış konumda yapılan ateşleme için puan kazanılamaz.
+                </p>
+            </div>
+            <div style="overflow-x:auto; margin-top:12px;">
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Aşama - 2 Kriteri</th><th>Puanlama</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Güvenli Atış Bölgesine Ulaşma</td><td class="mono text-accent">100 Puan</td></tr>
+                        <tr><td>Su Yüzeyine İstenen Açıyla Güvenli Çıkış</td><td class="mono text-accent">100 Puan</td></tr>
+                        <tr><td>Model Roketin Güvenli Bir Şekilde Fırlatılması</td><td class="mono text-accent">150 Puan</td></tr>
+                        <tr><td>Görev Boyunca Sızdırmazlığın Sağlanması</td><td class="mono text-accent">50 Puan</td></tr>
+                        <tr><td>Kazanılabilecek Maksimum Puan</td><td class="mono text-success">400 Puan</td></tr>
+                        <tr><td>Bonus Süre Puanı</td><td class="mono text-warning">&lt;80 Puan</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="alert alert-info" style="margin-top:12px; line-height:1.55;">
+                Bonus Süre Puanı (BSP) = 80 × ((60 - Görev Süresi Saniye) / 60). Bonus yalnızca 400 puanı tamamlayan takımlara kalan süreleri oranında verilir.
+            </div>
+        </div>
+    </div>
+
+    <details class="accordion" style="margin-top:4px;">
+        <summary>Ek güvenlik ve operasyon kuralları</summary>
+        <div style="padding:14px 16px; color:var(--text-muted); font-size:13px; line-height:1.65;">
+            <ul style="margin:0; padding-left:20px;">
+                <li>Hazırlık süresi 15 dakikadır.</li>
+                <li>Acil durdurma butonuna basıldıktan sonra yarışmaya devam edilip edilmeyeceğine hakem heyeti karar verir.</li>
+                <li>Test ortamında oluşabilecek aksaklıklarda testin sonlandırılmasına takım kaptanı karar verebilir.</li>
+                <li>Görev sonunda araç sızdırmazlık açısından incelenir; sızdırmazlığı sağlayan takımlar ilgili puanı alır.</li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+<div class="panel mb-16" style="padding:12px 18px; display:flex; gap:12px; flex-wrap:wrap; align-items:center">
+    <span class="panel-title" style="white-space:nowrap">Filtre:</span>
+    <form method="get" style="display:flex; gap:10px; flex-wrap:wrap">
+        <select name="durum" class="form-control" style="max-width:180px" onchange="this.form.submit()">
+            <option value="">Tüm Durumlar</option>
+            <option value="Devam Ediyor" selected="@(Model.DurumFiltre == "Devam Ediyor")">Devam Ediyor</option>
+            <option value="Tamamlandi" selected="@(Model.DurumFiltre == "Tamamlandi")">Tamamlandı</option>
+            <option value="Iptal" selected="@(Model.DurumFiltre == "Iptal")">İptal</option>
+        </select>
+    </form>
+</div>
+
+<div class="panel">
+    <div style="overflow-x:auto">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>#ID</th>
+                    <th>Görev Zamanı</th>
+                    <th>Araç</th>
+                    <th>Kullanıcı</th>
+                    <th>Açıklama</th>
+                    <th>Durum</th>
+                    <th>Telemetri</th>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <th>İşlem</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var g in Model.Gorevler)
+                {
+                    var badgeClass = g.Durum switch {
+                        "Tamamlandi" => "badge-success",
+                        "Devam Ediyor" => "badge-warning",
+                        "Iptal" => "badge-danger",
+                        _ => "badge-info"
+                    };
+                    <tr>
+                        <td class="mono text-accent">#@g.GorevId</td>
+                        <td>@g.GorevZamani.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>@(g.Arac?.AracAdi ?? "-")</td>
+                        <td>@(g.Kullanici != null ? $"{g.Kullanici.KullaniciAdi} {g.Kullanici.KullaniciSoyadi}" : "-")</td>
+                        <td style="max-width:280px; white-space:normal; line-height:1.45;">@(string.IsNullOrWhiteSpace(g.Aciklama) ? "-" : g.Aciklama)</td>
+                        <td><span class="badge @badgeClass">@g.Durum</span></td>
+                        <td class="mono">@g.TelemetriKayitlari.Count kayıt</td>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <td>
+                                <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                                    <a asp-page="/Gorevler/GorevDuzenle" asp-route-id="@g.GorevId" class="btn btn-secondary btn-sm" style="text-decoration:none;">Düzenle</a>
+                                    <form method="post" asp-page-handler="Sil" style="display:inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="gorevId" value="@g.GorevId" />
+                                        <button type="submit" class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Bu görevi silmek istediğinize emin misiniz?')">Sil</button>
+                                    </form>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                }
+                @if (!Model.Gorevler.Any())
+                {
+                    <tr><td colspan="@tabloKolon" class="text-muted" style="text-align:center; padding:30px">Görev bulunamadı.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

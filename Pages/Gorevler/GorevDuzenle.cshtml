@@ -1,0 +1,127 @@
+@page "{id:int}"
+@model SualtiRoketSistemi.Pages.Gorevler.GorevDuzenleModel
+@{
+    ViewData["Title"] = "Görev Düzenle";
+    ViewData["ActivePage"] = "gorevler";
+}
+
+<div class="page-header">
+    <div>
+        <div class="page-title">Görev Düzenle</div>
+        <div class="page-subtitle">#@Model.Form.GorevId numaralı görevin bilgilerini güncelleyin</div>
+    </div>
+    <a asp-page="/Gorevler/Index" class="btn btn-secondary">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        Görev Listesine Dön
+    </a>
+</div>
+
+@if (TempData["Hata"] != null)
+{
+    <div class="alert alert-danger">@TempData["Hata"]</div>
+}
+
+<div style="max-width:640px; margin:0 auto;">
+    <div class="panel">
+        <div class="panel-header">
+            <span class="panel-title">GÖREV BİLGİLERİ</span>
+            <span class="badge badge-info">Düzenleme</span>
+        </div>
+
+        <form method="post" style="padding: 8px 0;">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Form.GorevId" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="form-group" style="margin-bottom:20px;">
+                <label class="form-label" style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">Araç *</label>
+                <select asp-for="Form.AracId" class="form-control" required>
+                    <option value="">— Araç Seçin —</option>
+                    @foreach (var a in Model.Araclar)
+                    {
+                        <option value="@a.AracId">@a.AracAdi · @a.DonanimSurumu</option>
+                    }
+                </select>
+                <span asp-validation-for="Form.AracId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group" style="margin-bottom:20px;">
+                <label class="form-label" style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">Sorumlu Kullanıcı *</label>
+                <select asp-for="Form.KullaniciId" class="form-control" required>
+                    <option value="">— Kullanıcı Seçin —</option>
+                    @foreach (var k in Model.Kullanicilar)
+                    {
+                        <option value="@k.KayitId">@k.KullaniciAdi @k.KullaniciSoyadi (@k.Email)</option>
+                    }
+                </select>
+                <span asp-validation-for="Form.KullaniciId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group" style="margin-bottom:20px;">
+                <label class="form-label" style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">Görev Zamanı *</label>
+                <input asp-for="Form.GorevZamani" type="datetime-local" class="form-control" required />
+                <span asp-validation-for="Form.GorevZamani" class="text-danger"></span>
+            </div>
+
+            <div class="form-group" style="margin-bottom:20px;">
+                <label class="form-label" style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">Görev Açıklaması</label>
+                <textarea asp-for="Form.Aciklama" class="form-control" rows="4" maxlength="1000" placeholder="Görevin amacı, notları veya yapılacak işlem açıklaması..."></textarea>
+                <span asp-validation-for="Form.Aciklama" class="text-danger"></span>
+            </div>
+
+            <div class="form-group" style="margin-bottom:28px;">
+                <label class="form-label" style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">Durum *</label>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <label class="status-radio-label" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border:1px solid var(--border); border-radius:8px; cursor:pointer; flex:1; min-width:130px;">
+                        <input type="radio" asp-for="Form.Durum" value="Devam Ediyor" style="accent-color:var(--warning);" />
+                        <span class="badge badge-warning" style="pointer-events:none;">Devam Ediyor</span>
+                    </label>
+                    <label class="status-radio-label" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border:1px solid var(--border); border-radius:8px; cursor:pointer; flex:1; min-width:130px;">
+                        <input type="radio" asp-for="Form.Durum" value="Tamamlandi" style="accent-color:var(--success);" />
+                        <span class="badge badge-success" style="pointer-events:none;">Tamamlandı</span>
+                    </label>
+                    <label class="status-radio-label" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border:1px solid var(--border); border-radius:8px; cursor:pointer; flex:1; min-width:130px;">
+                        <input type="radio" asp-for="Form.Durum" value="Iptal" style="accent-color:var(--danger);" />
+                        <span class="badge badge-danger" style="pointer-events:none;">İptal</span>
+                    </label>
+                </div>
+                <span asp-validation-for="Form.Durum" class="text-danger"></span>
+            </div>
+
+            <hr style="border:none; border-top:1px solid var(--border); margin-bottom:24px;" />
+
+            <div style="display:flex; gap:12px; justify-content:flex-end;">
+                <a asp-page="/Gorevler/Index" class="btn btn-secondary">İptal</a>
+                <button type="submit" class="btn btn-primary" style="min-width:160px;">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:6px;">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                    Değişiklikleri Kaydet
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.querySelectorAll('input[name="Form.Durum"]').forEach(radio => {
+        const refresh = () => {
+            document.querySelectorAll('.status-radio-label').forEach(lbl => {
+                lbl.style.borderColor = 'var(--border)';
+                lbl.style.background = 'transparent';
+            });
+            const checked = document.querySelector('input[name="Form.Durum"]:checked');
+            if (checked) {
+                const lbl = checked.closest('.status-radio-label');
+                lbl.style.borderColor = 'var(--accent)';
+                lbl.style.background = 'rgba(73,166,255,0.07)';
+            }
+        };
+        radio.addEventListener('change', refresh);
+        refresh();
+    });
+</script>
+}

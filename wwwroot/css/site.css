@@ -1,0 +1,72 @@
+/* wwwroot/css/site.css — minimal site-specific overrides */
+
+/* Ensure Chart.js canvases don't overflow */
+canvas { display: block; max-width: 100%; }
+
+/* Scrollbar styling for dark theme */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+.login-logo {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+    text-align: center;
+}
+
+.login-logo-circle {
+    width: 102px;
+    height: 102px;
+    border-radius: 50%;
+    background: rgba(73, 166, 255, 0.08);
+    border: 2px solid rgba(73, 166, 255, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 22px auto;
+    overflow: hidden;
+    box-shadow:
+        0 0 18px rgba(73, 166, 255, 0.28),
+        inset 0 0 14px rgba(73, 166, 255, 0.08);
+}
+
+.aksa-logo-img {
+    width: 112px;
+    height: 112px;
+    object-fit: contain;
+    border-radius: 0;
+    display: block;
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    overflow: hidden;
+}
+
+.sidebar-logo-icon {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    max-width: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.login-sidebar-logo {
+    width: 55px;
+    height: 55px;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
+}

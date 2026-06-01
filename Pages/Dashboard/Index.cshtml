@@ -1,0 +1,212 @@
+@page
+@model SualtiRoketSistemi.Pages.Dashboard.IndexModel
+@{
+    ViewData["Title"] = "Ana Panel";
+    ViewData["ActivePage"] = "dashboard";
+}
+
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <div class="page-title">Ana Panel</div>
+        <div class="page-subtitle">Sualtı Roket Sistemi · Gerçek Zamanlı İzleme</div>
+    </div>
+    <div class="flex gap-8" style="align-items:center; gap:10px;">
+        <span class="badge badge-info">@DateTime.Now.ToString("dd MMM yyyy")</span>
+    </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Toplam Görev</div>
+        <div class="stat-value">@Model.ToplamGorev</div>
+        <div class="stat-unit">kayıtlı görev</div>
+        <div class="stat-icon">
+            <svg width="48" height="48" fill="none" stroke="#49a6ff" stroke-width="1" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        </div>
+    </div>
+
+    <div class="stat-card success">
+        <div class="stat-label">Aktif Görev</div>
+        <div class="stat-value text-success">@Model.AktifGorev</div>
+        <div class="stat-unit">devam ediyor</div>
+        <div class="stat-icon">
+            <svg width="48" height="48" fill="none" stroke="#2ecc71" stroke-width="1" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">IMU Kayıt</div>
+        <div class="stat-value">@Model.ToplamTelemetri</div>
+        <div class="stat-unit">telemetri satırı</div>
+        <div class="stat-icon">
+            <svg width="48" height="48" fill="none" stroke="#49a6ff" stroke-width="1" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+    </div>
+
+    <div class="stat-card @(Model.AktifSizinti ? "danger" : "success")">
+        <div class="stat-label">Sıvı Sızıntısı</div>
+        <div class="stat-value @(Model.AktifSizinti ? "text-danger" : "text-success")">
+            @(Model.AktifSizinti ? "⚠ ALGILANDI" : "✓ YOK")
+        </div>
+        <div class="stat-unit">son kontrol</div>
+        <div class="stat-icon">
+            <svg width="48" height="48" fill="none" stroke="@(Model.AktifSizinti ? "#ff5c79" : "#2ecc71")" stroke-width="1" viewBox="0 0 24 24"><path d="M12 22a7 7 0 007-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 007 7z"/></svg>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">Kullanıcılar</div>
+        <div class="stat-value">@Model.ToplamKullanici</div>
+        <div class="stat-unit">kayıtlı hesap</div>
+        <div class="stat-icon">
+            <svg width="48" height="48" fill="none" stroke="#49a6ff" stroke-width="1" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">IMU Dosyaları</div>
+        <div class="stat-value">@Model.ImuDosyaSayisi</div>
+        <div class="stat-unit">.txt veri dosyası</div>
+        <div class="stat-icon">
+            <svg width="48" height="48" fill="none" stroke="#49a6ff" stroke-width="1" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="panel-row">
+    <!-- İvme Grafiği -->
+    <div class="panel">
+        <div class="panel-header">
+            <span class="panel-title">İVMEÖLÇER (Son Veri)</span>
+            <span class="badge badge-info">ax · ay · az</span>
+        </div>
+        <div class="chart-wrap">
+            <canvas id="accChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Jiroskop Grafiği -->
+    <div class="panel">
+        <div class="panel-header">
+            <span class="panel-title">JİROSKOP (Son Veri)</span>
+            <span class="badge badge-info">gx · gy · gz</span>
+        </div>
+        <div class="chart-wrap">
+            <canvas id="gyroChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Telemetri DB Grafiği + Son Görevler -->
+<div class="panel-row">
+    <div class="panel" style="flex:2; min-width:400px">
+        <div class="panel-header">
+            <span class="panel-title">DERINLIK & AÇILAR (DB Telemetri)</span>
+        </div>
+        <div class="chart-wrap">
+            <canvas id="telemetriChart"></canvas>
+        </div>
+    </div>
+
+    <div class="panel" style="min-width:260px">
+        <div class="panel-header">
+            <span class="panel-title">SON GÖREVLER</span>
+        </div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Görev</th>
+                    <th>Durum</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var g in Model.SonGorevler)
+                {
+                    <tr>
+                        <td>
+                            <div class="mono">#@g.GorevId</div>
+                            <div style="font-size:12px; color:var(--text-muted)">@g.GorevZamani.ToString("dd.MM.yy HH:mm")</div>
+                        </td>
+                        <td>
+                            @{
+                                var badgeClass = g.Durum switch {
+                                    "Tamamlandi" => "badge-success",
+                                    "Devam Ediyor" => "badge-warning",
+                                    _ => "badge-info"
+                                };
+                            }
+                            <span class="badge @badgeClass">@g.Durum</span>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.SonGorevler.Any())
+                {
+                    <tr><td colspan="2" class="text-muted" style="text-align:center; padding:20px">Görev bulunamadı</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+// IMU verisi: son yüklenen dosyadan çek
+const imuData = @Html.Raw(Model.ImuJsonData);
+
+function makeLineChart(canvasId, labels, datasets) {
+    const ctx = document.getElementById(canvasId)?.getContext('2d');
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            animation: { duration: 600 },
+            plugins: { legend: { labels: { color: '#9aa0b7', font: { size: 11 } } } },
+            scales: {
+                x: { ticks: { color: '#9aa0b7', maxTicksLimit: 8 }, grid: { color: '#1a2347' } },
+                y: { ticks: { color: '#9aa0b7' }, grid: { color: '#1a2347' } }
+            }
+        }
+    });
+}
+
+if (imuData && imuData.length > 0) {
+    const labels = imuData.map(d => d.timestamp);
+
+    makeLineChart('accChart', labels, [
+        { label: 'ax', data: imuData.map(d => d.ax), borderColor: '#49a6ff', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
+        { label: 'ay', data: imuData.map(d => d.ay), borderColor: '#2ecc71', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
+        { label: 'az', data: imuData.map(d => d.az), borderColor: '#f1c40f', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
+    ]);
+
+    makeLineChart('gyroChart', labels, [
+        { label: 'gx', data: imuData.map(d => d.gx), borderColor: '#ff5c79', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
+        { label: 'gy', data: imuData.map(d => d.gy), borderColor: '#a855f7', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
+        { label: 'gz', data: imuData.map(d => d.gz), borderColor: '#06b6d4', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
+    ]);
+} else {
+    ['accChart','gyroChart'].forEach(id => {
+        const wrap = document.getElementById(id)?.parentElement;
+        if (wrap) wrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:13px">IMU veri dosyası bulunamadı — Telemetri sayfasından yükleyin</div>';
+    });
+}
+
+// DB Telemetri chart
+const telDb = @Html.Raw(Model.TelemetriJsonData);
+if (telDb && telDb.length > 0) {
+    makeLineChart('telemetriChart', telDb.map(d => d.zaman), [
+        { label: 'Derinlik Z', data: telDb.map(d => d.derinlikZ), borderColor: '#49a6ff', borderWidth: 2, pointRadius: 2, tension: 0.3, fill: false },
+        { label: 'Pitch', data: telDb.map(d => d.pitch), borderColor: '#2ecc71', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
+        { label: 'Roll', data: telDb.map(d => d.roll), borderColor: '#f1c40f', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
+        { label: 'Yaw', data: telDb.map(d => d.yaw), borderColor: '#ff5c79', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
+    ]);
+} else {
+    const wrap = document.getElementById('telemetriChart')?.parentElement;
+    if (wrap) wrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:13px">DB telemetri kaydı yok</div>';
+}
+</script>
+}

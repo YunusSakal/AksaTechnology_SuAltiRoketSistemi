@@ -1,0 +1,182 @@
+@page
+@model SualtiRoketSistemi.Pages.Gorevler.GorevEkleModel
+@{
+    ViewData["Title"] = "Görev Ekle";
+    ViewData["ActivePage"] = "gorevekle";
+}
+
+<div class="page-header">
+    <div>
+        <div class="page-title">Yeni Görev Oluştur</div>
+        <div class="page-subtitle">Dalış veya test görevi tanımlayın</div>
+    </div>
+    <a asp-page="/Gorevler/Index" class="btn btn-secondary">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        Görev Listesine Dön
+    </a>
+</div>
+
+@if (TempData["Hata"] != null)
+{
+    <div class="alert alert-danger">@TempData["Hata"]</div>
+}
+
+<div style="max-width:640px; margin:0 auto;">
+    <div class="panel">
+        <div class="panel-header">
+            <span class="panel-title">GÖREV BİLGİLERİ</span>
+            <span class="badge badge-info">Zorunlu alanlar *</span>
+        </div>
+
+        <form method="post" style="padding: 8px 0;">
+            @Html.AntiForgeryToken()
+
+            <!-- Araç Seçimi -->
+            <div class="form-group" style="margin-bottom:20px;">
+                <label class="form-label" style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <svg width="15" height="15" fill="none" stroke="var(--accent)" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                    </svg>
+                    Araç *
+                </label>
+                <select name="aracId" class="form-control" required>
+                    <option value="">— Araç Seçin —</option>
+                    @foreach (var a in Model.Araclar)
+                    {
+                        <option value="@a.AracId">@a.AracAdi · @a.DonanimSurumu</option>
+                    }
+                </select>
+                <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Görevde kullanılacak sualtı aracını seçin.</div>
+            </div>
+
+            <!-- Sorumlu Kullanıcı -->
+            <div class="form-group" style="margin-bottom:20px;">
+                <label class="form-label" style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <svg width="15" height="15" fill="none" stroke="var(--accent)" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                    </svg>
+                    Sorumlu Kullanıcı *
+                </label>
+                <select name="kullaniciId" class="form-control" required>
+                    <option value="">— Kullanıcı Seçin —</option>
+                    @foreach (var k in Model.Kullanicilar)
+                    {
+                        <option value="@k.KayitId">@k.KullaniciAdi @k.KullaniciSoyadi (@k.Email)</option>
+                    }
+                </select>
+                <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Görevden sorumlu olacak personeli seçin.</div>
+            </div>
+
+            <!-- Görev Zamanı -->
+            <div class="form-group" style="margin-bottom:20px;">
+                <label class="form-label" style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <svg width="15" height="15" fill="none" stroke="var(--accent)" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    Görev Zamanı *
+                </label>
+                <input type="datetime-local"
+                       name="gorevZamani"
+                       class="form-control"
+                       value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")"
+                       required />
+                <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Görevin planlandığı veya başlayacağı zaman.</div>
+            </div>
+
+
+            <!-- Görev Açıklaması -->
+            <div class="form-group" style="margin-bottom:20px;">
+                <label class="form-label" style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <svg width="15" height="15" fill="none" stroke="var(--accent)" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                    </svg>
+                    Görev Açıklaması
+                </label>
+                <textarea name="aciklama" class="form-control" rows="4" maxlength="1000"
+                          placeholder="Görevin amacı, notları veya yapılacak işlem açıklaması..."></textarea>
+                <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">İsteğe bağlıdır. En fazla 1000 karakter yazabilirsiniz.</div>
+            </div>
+
+            <!-- Durum -->
+            <div class="form-group" style="margin-bottom:28px;">
+                <label class="form-label" style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <svg width="15" height="15" fill="none" stroke="var(--accent)" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+                    </svg>
+                    Başlangıç Durumu *
+                </label>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <label class="status-radio-label" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border:1px solid var(--border); border-radius:8px; cursor:pointer; flex:1; min-width:130px;">
+                        <input type="radio" name="durum" value="Devam Ediyor" checked style="accent-color:var(--warning);" />
+                        <span class="badge badge-warning" style="pointer-events:none;">Devam Ediyor</span>
+                    </label>
+                    <label class="status-radio-label" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border:1px solid var(--border); border-radius:8px; cursor:pointer; flex:1; min-width:130px;">
+                        <input type="radio" name="durum" value="Tamamlandi" style="accent-color:var(--success);" />
+                        <span class="badge badge-success" style="pointer-events:none;">Tamamlandı</span>
+                    </label>
+                    <label class="status-radio-label" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border:1px solid var(--border); border-radius:8px; cursor:pointer; flex:1; min-width:130px;">
+                        <input type="radio" name="durum" value="Iptal" style="accent-color:var(--danger);" />
+                        <span class="badge badge-danger" style="pointer-events:none;">İptal</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Ayırıcı -->
+            <hr style="border:none; border-top:1px solid var(--border); margin-bottom:24px;" />
+
+            <!-- Aksiyon Butonları -->
+            <div style="display:flex; gap:12px; justify-content:flex-end;">
+                <a asp-page="/Gorevler/Index" class="btn btn-secondary">İptal</a>
+                <button type="submit" class="btn btn-primary" style="min-width:160px;">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:6px;">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                    Görevi Kaydet
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bilgi Kartı -->
+    <div class="panel" style="margin-top:16px; background:rgba(73,166,255,0.05); border-color:rgba(73,166,255,0.2);">
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+            <svg width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0; margin-top:1px;">
+                <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+            </svg>
+            <div>
+                <div style="font-size:13px; font-weight:600; color:var(--text); margin-bottom:4px;">Görev Oluşturma Hakkında</div>
+                <div style="font-size:12px; color:var(--text-muted); line-height:1.6;">
+                    Görev oluşturulduktan sonra <strong style="color:var(--text);">Telemetri</strong> sayfasından IMU verisi yükleyebilirsiniz.
+                    Açıklama ve durum bilgisi daha sonra Görev Listesi'ndeki Düzenle butonundan güncellenebilir.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Seçili radio'nun border rengini güncelle
+    document.querySelectorAll('input[name="durum"]').forEach(radio => {
+        radio.addEventListener('change', function () {
+            document.querySelectorAll('.status-radio-label').forEach(lbl => {
+                lbl.style.borderColor = 'var(--border)';
+                lbl.style.background = 'transparent';
+            });
+            if (this.checked) {
+                const lbl = this.closest('.status-radio-label');
+                lbl.style.borderColor = 'var(--accent)';
+                lbl.style.background = 'rgba(73,166,255,0.07)';
+            }
+        });
+        // Başlangıçta seçili olanı vurgula
+        if (radio.checked) {
+            const lbl = radio.closest('.status-radio-label');
+            lbl.style.borderColor = 'var(--accent)';
+            lbl.style.background = 'rgba(73,166,255,0.07)';
+        }
+    });
+</script>
+}

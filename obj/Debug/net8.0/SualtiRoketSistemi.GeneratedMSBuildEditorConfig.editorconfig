@@ -1,0 +1,83 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = SualtiRoketSistemi
+build_property.RootNamespace = SualtiRoketSistemi
+build_property.ProjectDir = C:\Users\Yunus\Desktop\sssss\SualtiRoketSistemi\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\Yunus\Desktop\sssss\SualtiRoketSistemi
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/Yunus/Desktop/sssss/SualtiRoketSistemi/Pages/Account/Cikis.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxDaWtpcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Yunus/Desktop/sssss/SualtiRoketSistemi/Pages/Account/Giris.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxHaXJpcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Yunus/Desktop/sssss/SualtiRoketSistemi/Pages/Account/Yetkisiz.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxZZXRraXNpei5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Yunus/Desktop/sssss/SualtiRoketSistemi/Pages/Dashboard/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Yunus/Desktop/sssss/SualtiRoketSistemi/Pages/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Yunus/Desktop/sssss/SualtiRoketSistemi/Pages/Gorevler/GorevDuzenle.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcR29yZXZsZXJcR29yZXZEdXplbmxlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Yunus/Desktop/sssss/SualtiRoketSistemi/Pages/Gorevler/GorevEkle.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcR29yZXZsZXJcR29yZXZFa2xlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Yunus/Desktop/sssss/SualtiRoketSistemi/Pages/Gorevler/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcR29yZXZsZXJcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Yunus/Desktop/sssss/SualtiRoketSistemi/Pages/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Yunus/Desktop/sssss/SualtiRoketSistemi/Pages/Kullanicilar/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcS3VsbGFuaWNpbGFyXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Yunus/Desktop/sssss/SualtiRoketSistemi/Pages/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Yunus/Desktop/sssss/SualtiRoketSistemi/Pages/Telemetri/GecmisVeri.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGVsZW1ldHJpXEdlY21pc1ZlcmkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Yunus/Desktop/sssss/SualtiRoketSistemi/Pages/Telemetri/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGVsZW1ldHJpXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Yunus/Desktop/sssss/SualtiRoketSistemi/Pages/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Yunus/Desktop/sssss/SualtiRoketSistemi/Pages/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 

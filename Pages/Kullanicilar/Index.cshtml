@@ -1,0 +1,108 @@
+@page
+@model SualtiRoketSistemi.Pages.Kullanicilar.IndexModel
+@{
+    ViewData["Title"] = "Kullanıcı Yönetimi";
+    ViewData["ActivePage"] = "kullanicilar";
+}
+
+<div class="page-header">
+    <div>
+        <div class="page-title">Kullanıcı Yönetimi</div>
+        <div class="page-subtitle">Rol tabanlı erişim kontrolü · Admin Paneli</div>
+    </div>
+    <button class="btn btn-primary" onclick="document.getElementById('yeniKulModal').hidden=false">
+        + Yeni Kullanıcı
+    </button>
+</div>
+
+@if (TempData["Mesaj"] != null)
+{
+    <div class="alert alert-success">@TempData["Mesaj"]</div>
+}
+@if (TempData["Hata"] != null)
+{
+    <div class="alert alert-danger">@TempData["Hata"]</div>
+}
+
+<div class="panel">
+    <div style="overflow-x:auto">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Kullanıcı ID</th>
+                    <th>Ad Soyad</th>
+                    <th>E-Posta</th>
+                    <th>Rol(ler)</th>
+                    <th>Görev Sayısı</th>
+                    <th>İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var k in Model.Kullanicilar)
+                {
+                    var roller = k.KullaniciYetkileri.Select(ky => ky.Yetki?.YetkiAdi ?? "").Where(r => !string.IsNullOrEmpty(r)).ToList();
+                    <tr>
+                        <td class="mono text-accent">@k.KullaniciId</td>
+                        <td><strong>@k.KullaniciAdi @k.KullaniciSoyadi</strong></td>
+                        <td class="mono" style="font-size:13px">@k.Email</td>
+                        <td>
+                            @foreach (var r in roller)
+                            {
+                                <span class="badge @(r == "Admin" ? "badge-info" : "badge-success")" style="margin-right:4px">@r</span>
+                            }
+                        </td>
+                        <td class="mono">@k.Gorevler.Count</td>
+                        <td>
+                            <form method="post" asp-page-handler="Sil" style="display:inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="kayitId" value="@k.KayitId" />
+                                <button type="submit" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')">Sil</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Yeni Kullanıcı Modal -->
+<div id="yeniKulModal" class="modal-backdrop" hidden>
+    <div class="modal-card">
+        <h3>Yeni Kullanıcı Ekle</h3>
+        <form method="post" asp-page-handler="Ekle">
+            @Html.AntiForgeryToken()
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+                <div class="form-group">
+                    <label class="form-label">Ad</label>
+                    <input type="text" name="ad" class="form-control" required placeholder="Mehmet" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Soyad</label>
+                    <input type="text" name="soyad" class="form-control" required placeholder="Yılmaz" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">E-Posta</label>
+                <input type="email" name="email" class="form-control" required placeholder="m.yilmaz@roket.gov.tr" />
+            </div>            <div class="form-group">
+                <label class="form-label">Şifre</label>
+                <input type="password" name="sifre" class="form-control" required placeholder="Min. 8 karakter" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Rol</label>
+                <select name="yetkiId" class="form-control">
+                    @foreach (var y in Model.Yetkiler)
+                    {
+                        <option value="@y.YetkiId">@y.YetkiAdi</option>
+                    }
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('yeniKulModal').hidden=true">İptal</button>
+            </div>
+        </form>
+    </div>
+</div>

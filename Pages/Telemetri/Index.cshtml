@@ -1,0 +1,264 @@
+@page
+@model SualtiRoketSistemi.Pages.Telemetri.IndexModel
+@{
+    ViewData["Title"] = "IMU Telemetri";
+    ViewData["ActivePage"] = "telemetri";
+}
+
+@section Styles {
+<style>
+    .metric-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(145px,1fr)); gap:10px; margin-bottom:16px; }
+    .metric-box { border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px; background:rgba(255,255,255,.03); }
+    .metric-label { font-size:11px; color:var(--text-muted); }
+    .metric-value { font-size:20px; font-weight:700; color:var(--accent); margin-top:4px; }
+    .chart-note { font-size:12px; color:var(--text-muted); margin-top:8px; }
+</style>
+}
+
+<div class="page-header">
+    <div>
+        <div class="page-title">IMU Telemetri Grafikleri</div>
+        <div class="page-subtitle">Rota paneli kaldırıldı · iki IMU sensör verisi · ivme, jiroskop, yönelim ve hata grafikleri</div>
+    </div>
+    <div class="flex gap-8">
+        <form method="post" asp-page-handler="Upload" enctype="multipart/form-data" style="display:flex;gap:8px">
+            @Html.AntiForgeryToken()
+            <input type="file" name="ImuDosya" accept=".txt" class="form-control" style="width:240px; padding:6px 10px; font-size:13px" />
+            <button type="submit" class="btn btn-primary btn-sm">📤 Yükle</button>
+        </form>
+    </div>
+</div>
+
+@if (TempData["Mesaj"] != null) { <div class="alert alert-success">@TempData["Mesaj"]</div> }
+@if (TempData["Hata"] != null) { <div class="alert alert-danger">@TempData["Hata"]</div> }
+
+<div class="panel mb-16" style="padding:14px 18px; display:flex; align-items:center; gap:16px; flex-wrap:wrap">
+    <span class="panel-title" style="white-space:nowrap">Veri Dosyası:</span>
+    <form method="get" style="display:flex; gap:10px; flex:1; flex-wrap:wrap">
+        <select name="dosya" class="form-control" style="max-width:360px" onchange="this.form.submit()">
+            <option value="">-- Dosya Seçin --</option>
+            @foreach (var d in Model.DosyaListesi)
+            {
+                <option value="@d" selected="@(d == Model.SeciliDosya)">@d</option>
+            }
+        </select>
+        <select name="sayfa" class="form-control" style="max-width:140px" onchange="this.form.submit()">
+            @for (int i = 1; i <= Model.ToplamSayfa; i++)
+            {
+                <option value="@i" selected="@(i == Model.Sayfa)">Sayfa @i / @Model.ToplamSayfa</option>
+            }
+        </select>
+    </form>
+    @if (!string.IsNullOrEmpty(Model.SeciliDosya)) { <span class="badge badge-info">@Model.ToplamSatir satır</span> }
+</div>
+
+@if (Model.ImuVeriler.Any())
+{
+    <div class="metric-grid">
+        <div class="metric-box"><div class="metric-label">Toplam örnek</div><div class="metric-value">@Model.ToplamSatir</div></div>
+        <div class="metric-box"><div class="metric-label">Örnekleme</div><div class="metric-value" id="sampleRateBox">-</div></div>
+        <div class="metric-box"><div class="metric-label">Maks. |ivme|</div><div class="metric-value" id="maxAccelBox">-</div></div>
+        <div class="metric-box"><div class="metric-label">Maks. |jiroskop|</div><div class="metric-value" id="maxGyroBox">-</div></div>
+        <div class="metric-box"><div class="metric-label">Maks. |roll|</div><div class="metric-value" id="maxRollBox">-</div></div>
+        <div class="metric-box"><div class="metric-label">Maks. pitch</div><div class="metric-value" id="maxPitchBox">-</div></div>
+    </div>
+
+    <div class="panel-row">
+        <div class="panel">
+            <div class="panel-header"><span class="panel-title">IMU SENSÖR 1 — İVMEÖLÇER</span><span class="text-muted" style="font-size:12px">ax · ay · az</span></div>
+            <div class="chart-wrap"><canvas id="imu1AccChart"></canvas></div>
+            <div class="chart-note">Sensör 1 ivme verisi; dosyadaki ax, ay, az kolonlarından çizilir.</div>
+        </div>
+        <div class="panel">
+            <div class="panel-header"><span class="panel-title">IMU SENSÖR 1 — JİROSKOP</span><span class="text-muted" style="font-size:12px">gx · gy · gz</span></div>
+            <div class="chart-wrap"><canvas id="imu1GyroChart"></canvas></div>
+            <div class="chart-note">Sensör 1 açısal hız verisi; dosyadaki gx, gy, gz kolonlarından çizilir.</div>
+        </div>
+    </div>
+
+    <div class="panel-row mt-16">
+        <div class="panel">
+            <div class="panel-header"><span class="panel-title">IMU SENSÖR 2 — YÖNELİM</span><span class="text-muted" style="font-size:12px">roll · pitch · yaw</span></div>
+            <div class="chart-wrap"><canvas id="imu2AttitudeChart"></canvas></div>
+            <div class="chart-note">Sensör 2 yönelim verisi; roll, pitch, yaw alanları varsa doğrudan çizilir.</div>
+        </div>
+        <div class="panel">
+            <div class="panel-header"><span class="panel-title">IMU SENSÖR 2 — DERİNLİK / MESAFE / YAN HATA</span></div>
+            <div class="chart-wrap"><canvas id="imu2NavigationChart"></canvas></div>
+            <div class="chart-note">Derinlik, başlangıç/kıyı mesafesi ve lateral hata kolonları varsa birlikte gösterilir.</div>
+        </div>
+    </div>
+
+    <div class="panel-row mt-16">
+        <div class="panel"><div class="panel-header"><span class="panel-title">X EKSENİ — ax + gx + roll</span></div><div class="chart-wrap" style="height:220px"><canvas id="xChart"></canvas></div></div>
+        <div class="panel"><div class="panel-header"><span class="panel-title">Y EKSENİ — ay + gy + pitch</span></div><div class="chart-wrap" style="height:220px"><canvas id="yChart"></canvas></div></div>
+        <div class="panel"><div class="panel-header"><span class="panel-title">Z EKSENİ — az + gz + yaw</span></div><div class="chart-wrap" style="height:220px"><canvas id="zChart"></canvas></div></div>
+    </div>
+
+    <div class="panel mt-16">
+        <div class="panel-header"><span class="panel-title">VERİ TABLOSU</span><span class="text-muted" style="font-size:12px">Sayfa @Model.Sayfa / @Model.ToplamSayfa</span></div>
+        <div style="overflow-x:auto">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>t(s)</th><th>Durum</th><th>ax</th><th>ay</th><th>az</th><th>gx</th><th>gy</th><th>gz</th><th>roll</th><th>pitch</th><th>yaw</th><th>derinlik</th><th>mesafe</th><th>yan hata</th><th>event</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var v in Model.ImuVeriler)
+                    {
+                        <tr>
+                            <td class="mono">@v.TimeSeconds.ToString("F1")</td>
+                            <td>@(string.IsNullOrWhiteSpace(v.State) ? "-" : v.State)</td>
+                            <td class="mono">@v.Ax.ToString("F3")</td>
+                            <td class="mono">@v.Ay.ToString("F3")</td>
+                            <td class="mono">@v.Az.ToString("F3")</td>
+                            <td class="mono @(Math.Abs(v.Gx) > 20 ? "text-warning" : "")">@v.Gx.ToString("F3")</td>
+                            <td class="mono">@v.Gy.ToString("F3")</td>
+                            <td class="mono @(Math.Abs(v.Gz) > 20 ? "text-warning" : "")">@v.Gz.ToString("F3")</td>
+                            <td class="mono @(Math.Abs(v.RollDeg ?? 0) > 12 ? "text-warning" : "")">@(v.RollDeg?.ToString("F1") ?? "-")</td>
+                            <td class="mono">@(v.PitchDeg?.ToString("F1") ?? "-")</td>
+                            <td class="mono">@(v.YawDeg?.ToString("F1") ?? "-")</td>
+                            <td class="mono">@(v.DepthM?.ToString("F2") ?? "-")</td>
+                            <td class="mono">@(v.DistanceFromStartM?.ToString("F1") ?? v.DistanceFromShoreM?.ToString("F1") ?? "-")</td>
+                            <td class="mono @(Math.Abs(v.LateralErrorM ?? 0) > 1 ? "text-warning" : "")">@(v.LateralErrorM?.ToString("F2") ?? "-")</td>
+                            <td>@(string.IsNullOrWhiteSpace(v.Event) ? "-" : v.Event)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else if (!string.IsNullOrEmpty(Model.SeciliDosya))
+{
+    <div class="alert alert-danger">Seçilen dosyada parse edilebilir veri bulunamadı.</div>
+}
+else
+{
+    <div class="panel flex-center" style="height:200px; flex-direction:column; gap:12px">
+        <svg width="48" height="48" fill="none" stroke="var(--text-muted)" stroke-width="1" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span class="text-muted">Bir IMU dosyası seçin veya yeni .txt dosyası yükleyin.</span>
+    </div>
+}
+
+@section Scripts {
+<script>
+const d = @Html.Raw(Model.ImuJsonData);
+
+function safeNum(v, fallback = null) {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : fallback;
+}
+function dtAt(i) {
+    if (!d || d.length < 2 || i === 0) return 0.5;
+    const raw = safeNum(d[i]?.timeS, safeNum(d[i]?.t, 0) / 1000) - safeNum(d[i - 1]?.timeS, safeNum(d[i - 1]?.t, 0) / 1000);
+    return raw > 0 && raw < 10 ? raw : 0.5;
+}
+function sampleRate() {
+    if (!d || d.length < 2) return 0;
+    let sum = 0;
+    for (let i = 1; i < d.length; i++) sum += dtAt(i);
+    return (d.length - 1) / Math.max(0.001, sum);
+}
+function labels() {
+    return d.map((x, i) => {
+        const t = safeNum(x.timeS, safeNum(x.t, i * 500) / 1000);
+        return Number.isFinite(t) ? t.toFixed(1) : String(i + 1);
+    });
+}
+function series(key) {
+    return d.map(x => safeNum(x[key], null));
+}
+function maxAbs(keys) {
+    const values = [];
+    for (const row of d) {
+        for (const key of keys) {
+            const n = safeNum(row[key], null);
+            if (n !== null) values.push(Math.abs(n));
+        }
+    }
+    return values.length ? Math.max(...values) : 0;
+}
+function maxVal(key) {
+    const values = d.map(x => safeNum(x[key], null)).filter(x => x !== null);
+    return values.length ? Math.max(...values) : 0;
+}
+function chartCfg(labels, datasets, yLabel) {
+    return {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 200 },
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { labels: { color: '#9aa0b7', font: { size: 11 } } } },
+            scales: {
+                x: { ticks: { color: '#9aa0b7', maxTicksLimit: 10 }, grid: { color: '#1a2347' } },
+                y: { title: { display: !!yLabel, text: yLabel || '', color: '#9aa0b7', font: { size: 11 } }, ticks: { color: '#9aa0b7' }, grid: { color: '#1a2347' } }
+            }
+        }
+    };
+}
+function ds(label, data, color) {
+    return { label, data, borderColor: color, borderWidth: 1.35, pointRadius: 0, tension: 0.25, spanGaps: true };
+}
+function createChart(id, datasets, yLabel) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    new Chart(canvas, chartCfg(labels(), datasets, yLabel));
+}
+
+if (d && d.length > 0) {
+    document.getElementById('sampleRateBox').textContent = sampleRate().toFixed(2) + ' Hz';
+    document.getElementById('maxAccelBox').textContent = maxAbs(['ax','ay','az']).toFixed(2) + ' m/s²';
+    document.getElementById('maxGyroBox').textContent = maxAbs(['gx','gy','gz']).toFixed(2) + ' °/s';
+    document.getElementById('maxRollBox').textContent = maxAbs(['roll']).toFixed(1) + '°';
+    document.getElementById('maxPitchBox').textContent = maxVal('pitch').toFixed(1) + '°';
+
+    createChart('imu1AccChart', [
+        ds('ax', series('ax'), '#49a6ff'),
+        ds('ay', series('ay'), '#2ecc71'),
+        ds('az', series('az'), '#f1c40f')
+    ], 'm/s²');
+
+    createChart('imu1GyroChart', [
+        ds('gx', series('gx'), '#ff5c79'),
+        ds('gy', series('gy'), '#a855f7'),
+        ds('gz', series('gz'), '#06b6d4')
+    ], '°/s');
+
+    createChart('imu2AttitudeChart', [
+        ds('roll', series('roll'), '#ff5c79'),
+        ds('pitch', series('pitch'), '#f1c40f'),
+        ds('yaw', series('yaw'), '#ffffff')
+    ], 'derece');
+
+    createChart('imu2NavigationChart', [
+        ds('depth', series('depth'), '#49a6ff'),
+        ds('distanceFromStart', series('distanceFromStart'), '#2ecc71'),
+        ds('distanceFromShore', series('distanceFromShore'), '#06b6d4'),
+        ds('lateralError', series('lateralError'), '#ff8c00')
+    ], 'metre');
+
+    createChart('xChart', [
+        ds('ax', series('ax'), '#49a6ff'),
+        ds('gx', series('gx'), '#ff5c79'),
+        ds('roll', series('roll'), '#f1c40f')
+    ], 'X ekseni');
+
+    createChart('yChart', [
+        ds('ay', series('ay'), '#2ecc71'),
+        ds('gy', series('gy'), '#a855f7'),
+        ds('pitch', series('pitch'), '#f1c40f')
+    ], 'Y ekseni');
+
+    createChart('zChart', [
+        ds('az', series('az'), '#f1c40f'),
+        ds('gz', series('gz'), '#06b6d4'),
+        ds('yaw', series('yaw'), '#ffffff')
+    ], 'Z ekseni');
+}
+</script>
+}

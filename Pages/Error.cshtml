@@ -1,0 +1,14 @@
+@page
+@model SualtiRoketSistemi.Pages.ErrorModel
+@{
+    ViewData["Title"] = "Hata";
+}
+
+<div class="flex-center" style="min-height:60vh; flex-direction:column; gap:16px">
+    <svg width="64" height="64" fill="none" stroke="var(--danger)" stroke-width="1.5" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <h2 class="font-orb text-danger">Sistem Hatası</h2>
+    <p class="text-muted">İstek ID: <span class="mono">@Model.RequestId</span></p>
+    <a asp-page="/Dashboard/Index" class="btn btn-primary">Ana Panele Dön</a>
+</div>
